@@ -15,6 +15,11 @@ class CategoryTypeController extends Controller
     {
 
         $category_types = CategoryType::query()
+
+        ->when(!is_null($request->search), function($query) use($request){
+            $query->where('name', 'like', '%' . $request->search . '%')
+            ->orWhere('status', 'like', '%' . $request->search . '%');
+        })
         ->when(isset($request->sortField) && !is_null($request->sortField), function($query) use($request){
             $query->orderBy(strtolower($request->sortField), $request->sortOrder == 1 ? 'asc':'desc');
         })
