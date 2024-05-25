@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\CategoryType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class CategoryTypeFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
+            'status' => $this->faker->randomElement([CategoryType::STATUS_ACTIVE, CategoryType::STATUS_INACTIVE]),
         ];
     }
 }

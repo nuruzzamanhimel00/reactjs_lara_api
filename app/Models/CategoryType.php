@@ -11,5 +11,9 @@ class CategoryType extends Model
 
     protected $fillable = [
         'name',
+        'status',
     ];
+
+    public CONST STATUS_ACTIVE = 'active';
+    public CONST STATUS_INACTIVE = 'inactive';
 }
