@@ -81,4 +81,11 @@ class CategoryTypeController extends Controller
 
         }
     }
+
+    public function selected_category_type_delete(Request $request)
+    {
+        // return ($request->all());
+        $category_type = CategoryType::whereIn('id', $request->ids)->delete();
+        return response()->json(['status' => true, 'message' => 'Deleted successfully']);
+    }
 }

@@ -12,6 +12,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('category-type', CategoryTypeController::class);
+    Route::post('selected/category-type-delete', [CategoryTypeController::class,'selected_category_type_delete']);
 });
 Route::post('/login',[AuthenticationAdminController::class,'login']);
 
