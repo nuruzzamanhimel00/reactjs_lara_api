@@ -72,6 +72,13 @@ class CategoryTypeController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $category_type = CategoryType::find($id);
+        if(!is_null($category_type)){
+            //image delete
+            //db delete
+            $category_type->delete();
+            return response()->json(['status' => true, 'message' => 'Deleted successfully']);
+
+        }
     }
 }
