@@ -25,6 +25,9 @@ class CategoryTypeController extends Controller
         ->when(isset($request->sortField) && !is_null($request->sortField), function($query) use($request){
             $query->orderBy(strtolower($request->sortField), $request->sortOrder == 1 ? 'asc':'desc');
         })
+        ->when( is_null($request->sortField), function($query) use($request){
+            $query->orderBy('id','desc');
+        })
         ->paginate($request->rows);
         return response()->json($category_types);
     }
