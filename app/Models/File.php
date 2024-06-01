@@ -5,22 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryType extends Model
+class File extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'status',
-    ];
-
+    protected $guarded = [];
     public CONST STATUS_ACTIVE = 'active';
     public CONST STATUS_INACTIVE = 'inactive';
 
-    public const FILE_STORE_PATH = 'category_type';
-
-    public function files()
+    public function file()
     {
-        return $this->morphMany(File::class, 'fileable');
+        return $this->morphTo();
     }
 }

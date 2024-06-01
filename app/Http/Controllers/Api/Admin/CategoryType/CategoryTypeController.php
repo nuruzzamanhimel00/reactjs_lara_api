@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\Admin\CategoryType;
 
+use App\Models\File;
 use App\Models\CategoryType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryTypeController extends Controller
 {
@@ -40,8 +42,47 @@ class CategoryTypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|unique:category_types|max:15',
+            'status' => 'required',
+            'file' => 'required',
+        ]);
+        try {
+            //category type created
+            $category_type = CategoryType::create([
+                'name' => $request->name,
+                'status'=>CategoryType::STATUS_ACTIVE,
+            ]);
+
+            //if file exist
+            $category_file = [];
+            if(!empty($request['file']) && !is_null($category_type) ){
+                //image store
+                $file = $request['file'];
+                $category_file['name'] = store_file($file['path'], CategoryType::FILE_STORE_PATH);
+                $category_file['type'] =$file['type'];
+                $category_file['status'] =File::STATUS_ACTIVE;
+                //image store into db
+                $category_type->files()->create($category_file);
+
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Created successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+
+        // return $category_type;
     }
+
+
 
     /**
      * Display the specified resource.
