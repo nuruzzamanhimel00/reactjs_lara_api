@@ -15,7 +15,7 @@ class File extends Model
 
 
     protected $appends = [
-        'file_url'
+        'path'
     ];
 
     public function file()
@@ -23,7 +23,7 @@ class File extends Model
         return $this->morphTo();
     }
 
-    public function getFileUrlAttribute(){
+    public function getPathAttribute(){
         return getStorageImage(self::FILE_STORE_PATH, $this->name, false);
     }
 }

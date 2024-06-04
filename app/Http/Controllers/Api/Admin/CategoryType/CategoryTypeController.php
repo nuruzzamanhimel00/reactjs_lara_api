@@ -67,7 +67,7 @@ class CategoryTypeController extends Controller
                 $category_file['type'] =$file['type'];
                 $category_file['status'] =File::STATUS_ACTIVE;
                 //image store into db
-                $category_type->files()->create($category_file);
+                $category_type->file()->create($category_file);
 
             }
 
@@ -82,8 +82,6 @@ class CategoryTypeController extends Controller
             ]);
         }
 
-
-        // return $category_type;
     }
 
 
@@ -112,7 +110,39 @@ class CategoryTypeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|unique:category_types,name,'.$id.'|max:15',
+            'status' => 'required',
+            'file' => 'required',
+        ]);
+
+        $category_type = CategoryType::query()
+        ->with(['file'])
+        ->updateOrCreate(['id'=>$request->id], $request->all());
+
+        if(!empty($request['file'])   ){
+            $file = $request['file'];
+            if(base64_path_check($file['path'])){
+                if(!is_null($category_type->file)){
+
+                    delete_file(File::FILE_STORE_PATH."/".$category_type->file->name);
+                    $category_type->file()->delete();
+                }
+
+                $category_file['name'] = store_file($file['path'], File::FILE_STORE_PATH);
+                $category_file['type'] =$file['type'];
+                $category_file['status'] =File::STATUS_ACTIVE;
+                //image store into db
+                $category_type->file()->create($category_file);
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Updated successfully',
+        ]);
+        return $category_type;
+
     }
 
     /**

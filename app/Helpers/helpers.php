@@ -37,54 +37,81 @@ if (!function_exists('store_file')) {
 
     }
 
-    //------ Store new Purchase -------------\\
-     function mimeToExtension($mimeType)
-    {
-        $mimeMap = [
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/gif' => 'gif',
-            'image/bmp' => 'bmp',
-            'image/svg+xml' => 'svg',
-            'application/pdf' => 'pdf',
-            'text/plain' => 'txt',
-            // Add more MIME types and their corresponding extensions as needed
-        ];
+}
 
-        return isset($mimeMap[$mimeType]) ? $mimeMap[$mimeType] : 'bin';
-    }
 
-    function getStorageImage($path, $name, $is_user = false, $resizable = false)
-    {
-        if ($name && Storage::exists($path . '/' . $name)) {
-            \Log::info('Eist');
-            if ($resizable) {
-                $full_path = 'storage/' . $path . '/' . $name;
-                if ($name) {
-                    return $full_path;
-                }
+//------ Store new Purchase -------------\\
+function mimeToExtension($mimeType)
+{
+    $mimeMap = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/bmp' => 'bmp',
+        'image/svg+xml' => 'svg',
+        'application/pdf' => 'pdf',
+        'text/plain' => 'txt',
+        // Add more MIME types and their corresponding extensions as needed
+    ];
+
+    return isset($mimeMap[$mimeType]) ? $mimeMap[$mimeType] : 'bin';
+}
+
+function getStorageImage($path, $name, $is_user = false, $resizable = false)
+{
+    if (!is_null($name) && Storage::exists($path . '/' . $name)) {
+
+        if ($resizable) {
+            $full_path = 'storage/' . $path . '/' . $name;
+            if ($name) {
+                return $full_path;
             }
-            return  config('app.url')->asset('storage/' . $path . '/' . $name);
         }
-        \Log::info(  config('app.url'));
-        return $is_user ? getUserDefaultImage() : getDefaultImage();
+        return  asset(config('app.url').'storage/' . $path . '/' . $name);
     }
-    /**
-     * getUserDefaultImage
-     *
-     * @return void
-     */
-    function getUserDefaultImage()
+return $is_user ? getUserDefaultImage() : getDefaultImage();
+}
+/**
+ * getUserDefaultImage
+ *
+ * @return void
+ */
+function getUserDefaultImage()
+{
+    return  asset(config('app.url').'images/user_default.png');
+}
+/**
+ * getDefaultImage
+ *
+ * @return void
+ */
+function getDefaultImage()
+{
+    return  asset(config('app.url').'images/default.png');
+}
+
+if (!function_exists('base64_path_check')) {
+
+    function base64_path_check($path = null)
     {
-        return  asset(config('app.url').'images/user_default.png');
+
+        return preg_match('/^data:image\/(png|jpg|jpeg);base64,/', $path);
+
     }
-    /**
-     * getDefaultImage
-     *
-     * @return void
-     */
-    function getDefaultImage()
+
+}
+
+if (!function_exists('delete_file')) {
+
+    function delete_file($filePath = null)
     {
-        return  asset(config('app.url').'images/default.png');
+
+        if (Storage::exists($filePath)) {
+            // Delete the file
+            Storage::delete($filePath);
+
+        }
+
     }
+
 }
