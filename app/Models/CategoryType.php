@@ -19,8 +19,8 @@ class CategoryType extends Model
 
     public const FILE_STORE_PATH = 'category_type';
 
-    public function files()
+    public function file()
     {
-        return $this->morphMany(File::class, 'fileable');
+        return $this->morphOne(File::class, 'fileable');
     }
 }

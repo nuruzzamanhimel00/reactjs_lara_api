@@ -53,4 +53,38 @@ if (!function_exists('store_file')) {
 
         return isset($mimeMap[$mimeType]) ? $mimeMap[$mimeType] : 'bin';
     }
+
+    function getStorageImage($path, $name, $is_user = false, $resizable = false)
+    {
+        if ($name && Storage::exists($path . '/' . $name)) {
+            \Log::info('Eist');
+            if ($resizable) {
+                $full_path = 'storage/' . $path . '/' . $name;
+                if ($name) {
+                    return $full_path;
+                }
+            }
+            return  config('app.url')->asset('storage/' . $path . '/' . $name);
+        }
+        \Log::info(  config('app.url'));
+        return $is_user ? getUserDefaultImage() : getDefaultImage();
+    }
+    /**
+     * getUserDefaultImage
+     *
+     * @return void
+     */
+    function getUserDefaultImage()
+    {
+        return  asset(config('app.url').'images/user_default.png');
+    }
+    /**
+     * getDefaultImage
+     *
+     * @return void
+     */
+    function getDefaultImage()
+    {
+        return  asset(config('app.url').'images/default.png');
+    }
 }

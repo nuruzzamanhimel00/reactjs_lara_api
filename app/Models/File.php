@@ -11,9 +11,19 @@ class File extends Model
     protected $guarded = [];
     public CONST STATUS_ACTIVE = 'active';
     public CONST STATUS_INACTIVE = 'inactive';
+    public const FILE_STORE_PATH = 'files';
+
+
+    protected $appends = [
+        'file_url'
+    ];
 
     public function file()
     {
         return $this->morphTo();
+    }
+
+    public function getFileUrlAttribute(){
+        return getStorageImage(self::FILE_STORE_PATH, $this->name, false);
     }
 }

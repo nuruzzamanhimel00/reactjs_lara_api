@@ -17,7 +17,7 @@ class CategoryTypeController extends Controller
     {
 
         $category_types = CategoryType::query()
-
+        ->with(['file'])
         ->when(!is_null($request->search), function($query) use($request){
             $query->where('name', 'like', '%' . $request->search . '%')
             ->orWhere('status', 'like', '%' . $request->search . '%');
@@ -45,6 +45,7 @@ class CategoryTypeController extends Controller
      */
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'name' => 'required|unique:category_types|max:15',
             'status' => 'required',
@@ -62,7 +63,7 @@ class CategoryTypeController extends Controller
             if(!empty($request['file']) && !is_null($category_type) ){
                 //image store
                 $file = $request['file'];
-                $category_file['name'] = store_file($file['path'], CategoryType::FILE_STORE_PATH);
+                $category_file['name'] = store_file($file['path'], File::FILE_STORE_PATH);
                 $category_file['type'] =$file['type'];
                 $category_file['status'] =File::STATUS_ACTIVE;
                 //image store into db
@@ -92,7 +93,10 @@ class CategoryTypeController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $category_type = CategoryType::query()
+        ->with(['file'])
+        ->find($id);
+        return response()->json($category_type);
     }
 
     /**
