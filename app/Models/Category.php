@@ -14,4 +14,22 @@ class Category extends Model
         'category_type_id',
         'parent_id',
     ];
+
+
+    public function parent(){
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function categories(){
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function allCategories(){
+        return $this->categories()->with('allCategories');
+    }
+      // Define the relationship to the category type
+      public function categoryType()
+      {
+          return $this->belongsTo(CategoryType::class,'category_type_id','id');
+      }
 }
