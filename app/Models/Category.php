@@ -14,6 +14,8 @@ class Category extends Model
         'category_type_id',
         'parent_id',
     ];
+    public CONST STATUS_ACTIVE = 'active';
+    public CONST STATUS_INACTIVE = 'inactive';
 
 
     public function parent(){
@@ -32,4 +34,9 @@ class Category extends Model
       {
           return $this->belongsTo(CategoryType::class,'category_type_id','id');
       }
+
+      public function file()
+    {
+        return $this->morphOne(File::class, 'fileable');
+    }
 }
