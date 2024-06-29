@@ -13,6 +13,7 @@ class Category extends Model
         'name',
         'category_type_id',
         'parent_id',
+        'status',
     ];
     public CONST STATUS_ACTIVE = 'active';
     public CONST STATUS_INACTIVE = 'inactive';

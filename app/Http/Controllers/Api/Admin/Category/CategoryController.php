@@ -100,7 +100,10 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $data = Category::query()
+            ->with(['file','parent'])
+            ->find($id);
+        return response()->json($data);
     }
 
     /**
@@ -116,7 +119,47 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|unique:categories,name,' . $id . '',
+            'status' => 'required',
+            'file' => 'required',
+            'category_type_id' => 'required|exists:category_types,id',
+        ]);
+
+        try {
+            //category create
+            $data = Category::query()
+            ->with(['file','parent'])
+            ->updateOrCreate(['id' => $request->id], $request->all());
+
+        $file_data = [];
+        if (!empty($request['file'])) {
+            $file = $request['file'];
+            if (base64_path_check($file['path'])) {
+                if (!is_null($data->file)) {
+
+                    delete_file(File::FILE_STORE_PATH . "/" . $data->file->name);
+                    $data->file()->delete();
+                }
+
+                $file_data['name'] = store_file($file['path'], File::FILE_STORE_PATH);
+                $file_data['type'] = $file['type'];
+                $file_data['status'] = File::STATUS_ACTIVE;
+                //image store into db
+                $data->file()->create($file_data);
+            }
+        }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Updated successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
