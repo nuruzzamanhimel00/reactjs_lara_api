@@ -55,7 +55,7 @@ class CategoryTypeController extends Controller
             //category type created
             $category_type = CategoryType::create([
                 'name' => $request->name,
-                'status' => CategoryType::STATUS_ACTIVE,
+                'status' =>$request->status,
             ]);
 
             //if file exist

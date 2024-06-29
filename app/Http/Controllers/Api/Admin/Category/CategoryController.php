@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin\Category;
 
 use App\Models\File;
 use App\Models\Category;
+use App\Models\CategoryType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -34,7 +35,15 @@ class CategoryController extends Controller
             $query->orderBy('id','desc');
         })
         ->paginate($request->rows);
-        return response()->json($data);
+        $category_types = CategoryType::query()->latest()->get();
+        $Categories = Category::query()
+        ->select(['id','name'])
+        ->latest()->get();
+        return response()->json([
+            'category_types' => $category_types,
+            'P_categories' => $data,
+            'Categories' => $Categories,
+        ]);
     }
 
     /**
@@ -50,7 +59,40 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|unique:categories',
+            'status' => 'required',
+            'file' => 'required',
+            'category_type_id' => 'required|exists:category_types,id',
+        ]);
+
+        try {
+            //category create
+            $data = Category::create($request->all());
+            //if file exist
+            $file_data = [];
+            if (!empty($request['file']) && !is_null($data)) {
+                //image store
+                $file = $request['file'];
+                $file_data['name'] = store_file($file['path'], File::FILE_STORE_PATH);
+                $file_data['type'] = $file['type'];
+                $file_data['status'] = File::STATUS_ACTIVE;
+                //image store into db
+                $data->file()->create($file_data);
+
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Created successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
     }
 
     /**
@@ -83,7 +125,12 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $data = Category::query()->with(['file','allCategories.file'])->find($id);
+        $this->singleCategoryDelete($data);
+        return response()->json(['status' => true, 'message' => 'Deleted successfully']);
 
+    }
+
+    public function singleCategoryDelete($data){
         if (!is_null($data)) {
             if (!is_null($data->file)) {
 
@@ -104,8 +151,29 @@ class CategoryController extends Controller
             }
             //db delete
             $data->delete();
-            return response()->json(['status' => true, 'message' => 'Deleted successfully']);
+
 
         }
+    }
+
+
+    public function selected_category_delete(Request $request)
+    {
+
+        // return ($request->all());
+        $data = Category::query()
+            ->with(['file','allCategories.file'])
+            ->whereIn('id', $request->ids)
+            ->get();
+        if (count($data) > 0) {
+            foreach ($data as $cat) {
+                $this->singleCategoryDelete($cat);
+
+            }
+
+
+            return response()->json(['status' => true, 'message' => 'Deleted successfully']);
+        }
+
     }
 }
