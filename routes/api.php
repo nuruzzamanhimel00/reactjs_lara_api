@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Admin\Unit\UnitController;
 use App\Http\Controllers\Api\Admin\Category\CategoryController;
 use App\Http\Controllers\Api\Admin\Auth\AuthenticationAdminController;
 use App\Http\Controllers\Api\Admin\CategoryType\CategoryTypeController;
@@ -17,6 +18,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //category
     Route::resource('categories', CategoryController::class);
     Route::post('selected/category-delete', [CategoryController::class,'selected_category_delete']);
+    //unit
+    Route::resource('units', UnitController::class);
 });
 Route::post('/login',[AuthenticationAdminController::class,'login']);
 
